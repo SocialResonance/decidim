@@ -49,6 +49,13 @@ module Decidim
           authorized?(:join, resource: meeting)
       end
 
+      def can_join_waitlist?
+        meeting.waitlist_enabled? &&
+          !meeting.has_available_slots? &&
+          !meeting.has_registration_for?(user) &&
+          authorized?(:join_waitlist, resource: meeting)
+      end
+
       def can_leave_meeting?
         meeting.registrations_enabled?
       end
