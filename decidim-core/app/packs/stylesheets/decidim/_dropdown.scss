@@ -77,12 +77,24 @@
   }
 
   &__item {
-    @apply flex items-center text-secondary font-normal rounded hover:text-white hover:bg-secondary;
+    @apply flex items-center text-secondary font-normal rounded;
 
     font-size: 14px;
 
-    > svg {
-      @apply w-4 h-4 flex-none text-gray fill-current;
+    svg {
+      @apply w-4 h-4 flex-none text-secondary fill-current;
+    }
+
+    &:hover {
+      @apply text-white bg-secondary;
+
+      .button {
+        @apply text-white;
+      }
+
+      svg {
+        @apply fill-white;
+      }
     }
   }
 
