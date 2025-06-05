@@ -1,8 +1,5 @@
-FROM decidim/decidim:0.31.0.dev
-
-# Set production environment
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
+# Base stage with common dependencies
+FROM decidim/decidim:0.31.0.dev as base
 
 # Install system dependencies
 RUN apt-get update -qq && \
@@ -25,11 +22,48 @@ WORKDIR /workspace/social-resonance
 
 # Install dependencies
 RUN gem install bundler:2.4.22
+
+# Development stage
+FROM base as development
+
+ENV RAILS_ENV=development
+ENV NODE_ENV=development
+
+# Install all dependencies (including development and test)
+RUN bundle config set --local deployment 'false'
+RUN bundle install --jobs 4 --retry 3
+
+# Install Node.js dependencies (including dev dependencies)
+RUN npm install
+
+# Create necessary directories
+RUN mkdir -p tmp/pids tmp/cache tmp/sockets log public/uploads storage
+
+# Set correct permissions
+RUN chmod +x bin/*
+
+# Expose port
+EXPOSE 3000
+
+# Simple entrypoint for development
+RUN echo '#!/bin/bash\nset -e\ncd /workspace/social-resonance\nexec "$@"' > /usr/local/bin/dev-entrypoint.sh && \
+    chmod +x /usr/local/bin/dev-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+
+# Production stage
+FROM base as production
+
+ENV RAILS_ENV=production
+ENV NODE_ENV=production
+
+# Install production dependencies only
 RUN bundle config set --local deployment 'true'
 RUN bundle config set --local without 'development test'
 RUN bundle install --jobs 4 --retry 3
 
-# Install Node.js dependencies
+# Install Node.js dependencies (production only)
 RUN npm ci --only=production
 
 # Create necessary directories
@@ -48,7 +82,7 @@ RUN echo '#!/bin/bash\ncurl -f http://localhost:3000/health || exit 1' > /usr/lo
 # Expose port
 EXPOSE 3000
 
-# Add entrypoint script
+# Add production entrypoint script
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
@@ -69,11 +103,11 @@ bundle exec rails db:migrate\n\
 \n\
 # Start the server\n\
 echo "Starting application..."\n\
-exec "$@"' > /usr/local/bin/entrypoint.sh && \
-    chmod +x /usr/local/bin/entrypoint.sh
+exec "$@"' > /usr/local/bin/prod-entrypoint.sh && \
+    chmod +x /usr/local/bin/prod-entrypoint.sh
 
-# Use the entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# Use the production entrypoint
+ENTRYPOINT ["/usr/local/bin/prod-entrypoint.sh"]
 
 # Default command
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

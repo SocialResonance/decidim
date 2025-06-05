@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: social-resonance/Dockerfile
+      target: development  # We'll add a development stage to Dockerfile
+    restart: unless-stopped
+    environment:
+      # Rails Environment
+      - RAILS_ENV=development
+      - NODE_ENV=development
+
+      # Database Configuration (connect to host PostgreSQL)
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=decidim_social_resonance_development
+
+      # Redis Configuration (connect to host Redis)
+      - REDIS_URL=redis://host.docker.internal:6379/0
+
+      # Development Settings
+      - RAILS_SERVE_STATIC_FILES=false
+      - RAILS_LOG_LEVEL=debug
+      - RAILS_LOG_TO_STDOUT=true
+
+      # Decidim Configuration
+      - DECIDIM_APPLICATION_NAME=Social Resonance (Development)
+      - DECIDIM_MAILER_SENDER=dev@localhost
+      - DECIDIM_DEFAULT_LOCALE=en
+      - DECIDIM_AVAILABLE_LOCALES=en,ca,es
+      - DECIDIM_FORCE_SSL=false
+
+      # Storage Configuration (local for development)
+      - STORAGE_PROVIDER=local
+
+      # Background Jobs
+      - QUEUE_ADAPTER=sidekiq
+      - SIDEKIQ_CONCURRENCY=3
+
+      # Performance (development settings)
+      - RAILS_MAX_THREADS=5
+      - WEB_CONCURRENCY=1
+
+      # Development Tools
+      - BETTER_ERRORS=1
+      - BINDING_OF_CALLER=1
+
+      # Other
+      - PORT=3000
+
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for development
+      - .:/workspace
+      - bundle_cache:/usr/local/bundle
+      - node_modules_cache:/workspace/social-resonance/node_modules
+      - uploads:/workspace/social-resonance/storage
+      - logs:/workspace/social-resonance/log
+    working_dir: /workspace/social-resonance
+    command: bundle exec puma -C config/puma.rb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: social-resonance/Dockerfile
+      target: development
+    restart: unless-stopped
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      # Same environment variables as web service
+      - RAILS_ENV=development
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=decidim_social_resonance_development
+      - REDIS_URL=redis://host.docker.internal:6379/0
+      - SIDEKIQ_CONCURRENCY=3
+      - RAILS_LOG_LEVEL=debug
+      - RAILS_LOG_TO_STDOUT=true
+    volumes:
+      - .:/workspace
+      - bundle_cache:/usr/local/bundle
+      - uploads:/workspace/social-resonance/storage
+      - logs:/workspace/social-resonance/log
+    working_dir: /workspace/social-resonance
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  bundle_cache:
+  node_modules_cache:
+  uploads:
+  logs:

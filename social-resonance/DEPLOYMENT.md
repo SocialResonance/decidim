@@ -11,8 +11,9 @@ This guide explains how to deploy the Social Resonance Decidim application using
 ├── decidim-ai/
 ├── decidim-collaborative_texts/
 ├── social-resonance/           ← Your app here
-│   ├── Dockerfile
-│   ├── docker-compose.yml
+│   ├── Dockerfile (multi-stage: development & production)
+│   ├── docker-compose.development.yml
+│   ├── docker-compose.production.yml
 │   ├── Gemfile (with local path dependencies)
 │   └── ...
 └── ...
@@ -20,13 +21,58 @@ This guide explains how to deploy the Social Resonance Decidim application using
 
 ## Prerequisites
 
+### For Production Deployment
 1. **Coolify Instance**: Self-hosted or cloud
 2. **Managed Services**: PostgreSQL and Redis in Coolify
 3. **Domain Names**:
    - Staging: `staging.yourdomain.com`
    - Production: `production.yourdomain.com`
 
-## Deployment Steps
+### For Local Development
+1. **Docker & Docker Compose**: Installed locally
+2. **PostgreSQL**: Running locally (uncontainerized)
+3. **Redis**: Running locally (uncontainerized)
+4. **Git Repository**: Cloned with all Decidim modules
+
+## Local Development Setup
+
+### 1. Start Local Services
+Make sure PostgreSQL and Redis are running locally:
+
+```bash
+# macOS with Homebrew
+brew services start postgresql
+brew services start redis
+
+# Or using your preferred method
+```
+
+### 2. Run with Docker Compose
+```bash
+cd social-resonance
+docker-compose -f docker-compose.development.yml up --build
+```
+
+This will:
+- Build the development container
+- Connect to your local PostgreSQL and Redis
+- Mount source code for live reloading
+- Start the web server and Sidekiq workers
+
+### 3. Setup Database
+```bash
+# Create and migrate database
+docker-compose -f docker-compose.development.yml exec web bundle exec rails db:create db:migrate
+
+# Seed with sample data (optional)
+docker-compose -f docker-compose.development.yml exec web bundle exec rails db:seed
+```
+
+### 4. Access Application
+- **Web**: http://localhost:3000
+- **Logs**: `docker-compose -f docker-compose.development.yml logs -f`
+
+## Production Deployment Steps
 
 ### 1. Set Up Managed Services in Coolify
 
@@ -47,8 +93,9 @@ Create these managed services first:
 3. **Build Settings**:
    - **Build Pack**: Docker
    - **Dockerfile**: `social-resonance/Dockerfile`
-   - **Docker Compose File**: `social-resonance/docker-compose.yml`
+   - **Docker Compose File**: `social-resonance/docker-compose.production.yml`
    - **Build Context**: Repository root (not social-resonance subdirectory)
+   - **Build Target**: `production` (for multi-stage build)
 
 ### 3. Environment Variables
 
