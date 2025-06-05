@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: social-resonance/Dockerfile
+    restart: unless-stopped
+    environment:
+      # Rails Environment
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - RAILS_SERVE_STATIC_FILES=true
+
+      # Database Configuration (use Coolify managed PostgreSQL)
+      - DATABASE_URL=${DATABASE_URL}
+
+      # Redis Configuration (use Coolify managed Redis)
+      - REDIS_URL=${REDIS_URL}
+
+      # SMTP Configuration
+      - SMTP_ADDRESS=${SMTP_ADDRESS}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_AUTHENTICATION=${SMTP_AUTHENTICATION:-plain}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_DOMAIN=${SMTP_DOMAIN}
+      - SMTP_STARTTLS_AUTO=${SMTP_STARTTLS_AUTO:-true}
+
+      # Decidim Configuration
+      - DECIDIM_APPLICATION_NAME=${DECIDIM_APPLICATION_NAME:-Social Resonance}
+      - DECIDIM_MAILER_SENDER=${DECIDIM_MAILER_SENDER}
+      - DECIDIM_DEFAULT_LOCALE=${DECIDIM_DEFAULT_LOCALE:-en}
+      - DECIDIM_AVAILABLE_LOCALES=${DECIDIM_AVAILABLE_LOCALES:-en,ca,es}
+      - DECIDIM_FORCE_SSL=${DECIDIM_FORCE_SSL:-true}
+
+      # Storage Configuration (S3 recommended for production)
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-s3}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_REGION=${AWS_REGION}
+      - STORAGE_CDN_HOST=${STORAGE_CDN_HOST}
+
+      # Maps Configuration
+      - MAPS_PROVIDER=${MAPS_PROVIDER}
+      - MAPS_API_KEY=${MAPS_API_KEY}
+      - MAPS_STATIC_URL=${MAPS_STATIC_URL}
+      - MAPS_DYNAMIC_URL=${MAPS_DYNAMIC_URL}
+
+      # Background Jobs
+      - QUEUE_ADAPTER=${QUEUE_ADAPTER:-sidekiq}
+      - SIDEKIQ_CONCURRENCY=${SIDEKIQ_CONCURRENCY:-10}
+
+      # Performance
+      - RAILS_MAX_THREADS=${RAILS_MAX_THREADS:-5}
+      - WEB_CONCURRENCY=${WEB_CONCURRENCY:-4}
+
+      # Security & Performance
+      - RAILS_LOG_LEVEL=${RAILS_LOG_LEVEL:-warn}
+      - DECIDIM_THROTTLING_MAX_REQUESTS=${DECIDIM_THROTTLING_MAX_REQUESTS:-100}
+      - DECIDIM_THROTTLING_PERIOD=${DECIDIM_THROTTLING_PERIOD:-1}
+
+      # Other
+      - PORT=3000
+
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/storage
+      - logs:/app/log
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: social-resonance/Dockerfile
+    restart: unless-stopped
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      # Same environment variables as web service
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SMTP_ADDRESS=${SMTP_ADDRESS}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_DOMAIN=${SMTP_DOMAIN}
+      - DECIDIM_MAILER_SENDER=${DECIDIM_MAILER_SENDER}
+      - SIDEKIQ_CONCURRENCY=${SIDEKIQ_CONCURRENCY:-10}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_REGION=${AWS_REGION}
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-s3}
+    volumes:
+      - uploads:/app/storage
+      - logs:/app/log
+
+  # Cron jobs for scheduled tasks
+  cron:
+    build:
+      context: .
+      dockerfile: social-resonance/Dockerfile
+    restart: unless-stopped
+    command: |
+      sh -c '
+        echo "0 0 * * * cd /workspace/social-resonance && RAILS_ENV=production bundle exec rake decidim:delete_download_your_data_files" >> /etc/crontabs/root
+        echo "2 0 * * * cd /workspace/social-resonance && RAILS_ENV=production bundle exec rake decidim:open_data:export" >> /etc/crontabs/root
+        echo "3 0 * * * cd /workspace/social-resonance && RAILS_ENV=production bundle exec rake decidim_meetings:clean_registration_forms" >> /etc/crontabs/root
+        echo "4 0 * * * cd /workspace/social-resonance && RAILS_ENV=production bundle exec rake decidim:reminders:all" >> /etc/crontabs/root
+        echo "5 0 * * * cd /workspace/social-resonance && RAILS_ENV=production bundle exec rake decidim:mailers:notifications_digest_daily" >> /etc/crontabs/root
+        crond -f
+      '
+    environment:
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+    volumes:
+      - uploads:/app/storage
+      - logs:/app/log
+
+volumes:
+  uploads:
+  logs:

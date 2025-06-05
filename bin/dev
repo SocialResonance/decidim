@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
-cd development_app
+cd social-resonance
 
 ./bin/dev
