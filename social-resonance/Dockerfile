@@ -1,5 +1,5 @@
 # Base stage with common dependencies
-FROM ruby:3.1 as base
+FROM ruby:3.3 as base
 
 # Install system dependencies
 RUN apt-get update -qq && \
