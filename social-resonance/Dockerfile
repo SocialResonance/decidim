@@ -1,5 +1,5 @@
 # Base stage with common dependencies
-FROM decidim/decidim:0.31.0.dev as base
+FROM ruby:3.1 as base
 
 # Install system dependencies
 RUN apt-get update -qq && \
@@ -8,8 +8,19 @@ RUN apt-get update -qq && \
       wget \
       gnupg \
       lsb-release \
-      postgresql-client && \
+      postgresql-client \
+      nodejs \
+      npm \
+      git \
+      build-essential \
+      libpq-dev \
+      imagemagick \
+      libvips42 && \
     rm -rf /var/lib/apt/lists/*
+
+# Install latest Node.js LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y nodejs
 
 # Set work directory for the entire workspace
 WORKDIR /workspace
