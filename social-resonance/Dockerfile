@@ -1,124 +1,49 @@
-# Base stage with common dependencies
-FROM ruby:3.3 as base
+FROM ruby:3.3
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV NODE_MAJOR=18
 
 # Install system dependencies
-RUN apt-get update -qq && \
-    apt-get install -y \
-      curl \
-      wget \
-      gnupg \
-      lsb-release \
-      postgresql-client \
-      nodejs \
-      npm \
-      git \
-      build-essential \
-      libpq-dev \
-      imagemagick \
-      libvips42 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    graphviz \
+    imagemagick \
+    libicu-dev \
+    libpq-dev \
+    nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install latest Node.js LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-    apt-get install -y nodejs
+# Install node
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update -qq && apt-get install -y \
+    nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set work directory for the entire workspace
-WORKDIR /workspace
+# Create workdir
+RUN mkdir /decidim
+WORKDIR /decidim
 
-# Copy the entire repository structure
-COPY . .
+# Installs bundler dependencies
+ENV \
+  BUNDLE_BIN=/usr/local/bundle/bin \
+  BUNDLE_JOBS=10 \
+  BUNDLE_PATH=/usr/local/bundle \
+  BUNDLE_RETRY=3 \
+  GEM_HOME=/bundle
+ENV PATH="${BUNDLE_BIN}:${PATH}"
 
-# Change to the social-resonance app directory
-WORKDIR /workspace/social-resonance
+# Copy the entire decidim monorepo
+ADD . /decidim/
 
-# Install dependencies
-RUN gem install bundler:2.4.22
+# Set working directory to social-resonance
+WORKDIR /decidim/social-resonance
 
-# Development stage
-FROM base as development
+# Install bundler and bundle dependencies
+RUN gem install bundler:2.4.20
+RUN bundle install
 
-ENV RAILS_ENV=development
-ENV NODE_ENV=development
-
-# Install all dependencies (including development and test)
-RUN bundle config set --local deployment 'false'
-RUN bundle install --jobs 4 --retry 3
-
-# Install Node.js dependencies (including dev dependencies)
-RUN npm install
-
-# Create necessary directories
-RUN mkdir -p tmp/pids tmp/cache tmp/sockets log public/uploads storage
-
-# Set correct permissions
-RUN chmod +x bin/*
-
-# Expose port
-EXPOSE 3000
-
-# Simple entrypoint for development
-RUN echo '#!/bin/bash\nset -e\ncd /workspace/social-resonance\nexec "$@"' > /usr/local/bin/dev-entrypoint.sh && \
-    chmod +x /usr/local/bin/dev-entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
-
-# Production stage
-FROM base as production
-
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
-
-# Install production dependencies only
-RUN bundle config set --local deployment 'true'
-RUN bundle config set --local without 'development test'
-RUN bundle install --jobs 4 --retry 3
-
-# Install Node.js dependencies (production only)
-RUN npm ci --only=production
-
-# Create necessary directories
-RUN mkdir -p tmp/pids tmp/cache tmp/sockets log public/uploads storage
-
-# Set correct permissions
-RUN chmod +x bin/*
-
-# Precompile assets
-RUN bundle exec rails assets:precompile
-
-# Add health check script
-RUN echo '#!/bin/bash\ncurl -f http://localhost:3000/health || exit 1' > /usr/local/bin/health-check && \
-    chmod +x /usr/local/bin/health-check
-
-# Expose port
-EXPOSE 3000
-
-# Add production entrypoint script
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# Change to the app directory\n\
-cd /workspace/social-resonance\n\
-\n\
-# Wait for database to be ready\n\
-echo "Waiting for database..."\n\
-until pg_isready -h ${DATABASE_HOST:-postgres} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USERNAME:-postgres}; do\n\
-  echo "Database is unavailable - sleeping"\n\
-  sleep 1\n\
-done\n\
-echo "Database is up!"\n\
-\n\
-# Run database migrations\n\
-echo "Running database migrations..."\n\
-bundle exec rails db:migrate\n\
-\n\
-# Start the server\n\
-echo "Starting application..."\n\
-exec "$@"' > /usr/local/bin/prod-entrypoint.sh && \
-    chmod +x /usr/local/bin/prod-entrypoint.sh
-
-# Use the production entrypoint
-ENTRYPOINT ["/usr/local/bin/prod-entrypoint.sh"]
-
-# Default command
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+# Compile assets
+RUN npm i
+RUN npm i -g yarn
