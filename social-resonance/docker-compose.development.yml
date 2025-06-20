@@ -32,6 +32,8 @@ services:
       - DATABASE_USERNAME=postgres
       - RAILS_ENV=development
       - REDIS_URL=redis://redis:6379
+      - DECIDIM_SPAM_DETECTION_BACKEND_RESOURCE_URL=redis://redis:6379/2
+      - DECIDIM_SPAM_DETECTION_BACKEND_USER_REDIS_URL=redis://redis:6379/3
     links:
       - pg
       - redis
