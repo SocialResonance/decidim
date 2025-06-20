@@ -1,0 +1,6 @@
+---
+en:
+  decidim:
+    components:
+      decidim-template:
+        name: Decidim-template
