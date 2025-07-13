@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This is the executable for the decidim-module-factory gem.
+# It extends the original decidim generator with a new command.
+
+# Find original decidim executable from decidim-generators gem
+begin
+  gem "decidim-generators"
+rescue Gem::LoadError
+  puts "Could not load decidim-generators. Make sure it is installed."
+  exit 1
+end
+
+case ARGV[0]
+when "--module-factory"
+  ARGV.replace(["component", *ARGV[1..-1]])
+  require "decidim/module_factory/generator"
+  Decidim::ModuleFactory::Generator.start
+else
+  # Fallback to original decidim command
+  decidim_executable = Gem.bin_path("decidim-generators", "decidim")
+  load decidim_executable
+end

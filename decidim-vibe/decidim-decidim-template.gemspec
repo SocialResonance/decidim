@@ -5,7 +5,7 @@ $LOAD_PATH.push File.expand_path("lib", __dir__)
 require "decidim/decidim-template/version"
 
 Gem::Specification.new do |s|
-  s.version = Decidim::Decidim-template.version
+  s.version = Decidim::DecidimTemplate.version
   s.authors = ["Bastin"]
   s.email = ["BastinJafari@gmail.com"]
   s.license = "AGPL-3.0-or-later"
@@ -30,5 +30,5 @@ Gem::Specification.new do |s|
     end
   end
 
-  s.add_dependency "decidim-core", Decidim::Decidim-template.version
+  s.add_dependency "decidim-core", Decidim::DecidimTemplate.version
 end
