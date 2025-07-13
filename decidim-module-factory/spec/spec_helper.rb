@@ -1,9 +1,20 @@
 # frozen_string_literal: true
 
-require "decidim/dev"
+require "decidim/generators"
 
-ENV["ENGINE_ROOT"] = File.dirname(__dir__)
+require "json"
+require "fileutils"
+require "decidim/gem_manager"
 
-Decidim::Dev.dummy_app_path = File.expand_path(File.join("..", "spec", "decidim_dummy_app"))
+ENV["RETRY_TIMES"] = "0"
 
-require "decidim/dev/test/base_spec_helper"
+if ENV["SIMPLECOV"]
+  require "simplecov"
+
+  SimpleCov.add_filter "/lib/decidim/generators/app_templates/"
+  SimpleCov.add_filter "/lib/decidim/generators/component_templates/"
+end
+
+RSpec.configure do |config|
+  config.fail_fast = ENV.fetch("FAIL_FAST", nil) == "true"
+end
