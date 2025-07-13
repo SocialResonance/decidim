@@ -1,0 +1,21 @@
+# AI Development Rules for <%= name.camelize %>
+
+This document outlines the rules and guidelines for developing the <%= name.camelize %> Decidim module. These rules are designed to be used by an AI pair programmer to ensure consistency, quality, and adherence to the project's standards.
+
+## 1. Core Principles
+
+- **Modularity**: The module should be self-contained and have minimal dependencies on other modules.
+- **Extensibility**: The module should be designed to be easily extended and customized.
+- **Testability**: All code should be covered by automated tests.
+- **Security**: The module must follow all Decidim security best practices.
+
+## 2. Code Style
+
+- Follow the official [Decidim Development Guide](https://docs.decidim.org/en/develop/).
+- Adhere to the Ruby style guide and Rubocop rules defined in the project.
+
+## 3. AI Collaboration Guidelines
+
+- When generating code, the AI should always provide explanations for its choices.
+- The AI should ask for clarification if the requirements are ambiguous.
+- All generated code must include corresponding tests.

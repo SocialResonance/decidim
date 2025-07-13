@@ -9,16 +9,16 @@ module Decidim
 
     context "with a component" do
       let(:test_component) { "dummy_component" }
-      let(:command) { "decidim --component #{test_component}" }
+      let(:command) { "bundle exec decidim-module-factory --module-factory #{test_component}" }
       let(:semver_friendly_version) { Decidim::GemManager.semver_friendly_version(Decidim.version) }
       let(:npm_package_version) { "^#{semver_friendly_version}" }
 
-      after { FileUtils.rm_rf("decidim-module-#{test_component}") }
+      after { FileUtils.rm_rf("decidim-#{test_component}") }
 
       it "succeeds" do
         expect(result[1]).to be_success, result[0]
 
-        expect(JSON.parse(File.read("decidim-module-#{test_component}/package.json"))).to eq(
+        expect(JSON.parse(File.read("decidim-#{test_component}/package.json"))).to eq(
           "name" => "decidim-#{test_component}",
           "version" => "0.0.1",
           "description" => "",

@@ -4,7 +4,9 @@ source "https://rubygems.org"
 
 ruby RUBY_VERSION
 
+# Decidim framework with all of its components
 gem "decidim", path: "."
+gem "decidim-module-factory", path: "./decidim-module-factory"
 gem "decidim-ai", path: "."
 gem "decidim-collaborative_texts", path: "."
 gem "decidim-conferences", path: "."

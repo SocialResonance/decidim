@@ -2,10 +2,10 @@
 
 $LOAD_PATH.push File.expand_path("lib", __dir__)
 
-require "decidim/factory/version"
+require "decidim/module_factory/version"
 
 Gem::Specification.new do |s|
-  s.version = Decidim::Factory.version
+  s.version = Decidim::ModuleFactory.version
   s.authors = ["Bastin"]
   s.email = ["BastinJafari@gmail.com"]
   s.license = "AGPL-3.0-or-later"
@@ -19,9 +19,9 @@ Gem::Specification.new do |s|
   }
   s.required_ruby_version = "~> 3.3"
 
-  s.name = "decidim-factory"
-  s.summary = "A decidim factory module"
-  s.description = "bastsdf."
+  s.name = "decidim-module-factory"
+  s.summary = "A generator for decidim modules with AI rules."
+  s.description = "This gem provides a new generator command for decidim to create module boilerplate with AI development guidelines."
 
   s.files = Dir.chdir(__dir__) do
     `git ls-files -z`.split("\x0").select do |f|
@@ -33,6 +33,6 @@ Gem::Specification.new do |s|
   s.bindir = "exe"
   s.executables = ["decidim-module-factory"]
 
-  s.add_dependency "decidim-core", Decidim::Factory.version
-  s.add_dependency "decidim-generators", Decidim::Factory.version
+  s.add_dependency "decidim-core", "0.31.0.dev"
+  s.add_dependency "decidim-generators", "0.31.0.dev"
 end

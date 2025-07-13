@@ -12,6 +12,7 @@ module Decidim
       desc "component NAME", "Generate a decidim component with AI rules"
       def component(name)
         super
+        template "rules.md.tt", "decidim-#{name}/docs/rules.md"
       end
     end
   end

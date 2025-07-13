@@ -12,13 +12,11 @@ rescue Gem::LoadError
   exit 1
 end
 
-case ARGV[0]
-when "--module-factory"
-  ARGV.replace(["component", *ARGV[1..-1]])
-  require "decidim/module_factory/generator"
-  Decidim::ModuleFactory::Generator.start
-else
-  # Fallback to original decidim command
-  decidim_executable = Gem.bin_path("decidim-generators", "decidim")
-  load decidim_executable
+if ARGV[0] == "--module-factory"
+  ARGV.shift
+  ARGV.unshift("component")
 end
+
+# Fallback to original decidim command
+decidim_executable = Gem.bin_path("decidim-generators", "decidim")
+load decidim_executable
