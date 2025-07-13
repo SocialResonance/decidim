@@ -5,6 +5,8 @@ require "decidim/generators/component_generator"
 module Decidim
   module ModuleFactory
     class Generator < Decidim::Generators::ComponentGenerator
+      source_root File.expand_path("templates", __dir__)
+
       def self.banner
         "decidim-module-factory --module-factory NAME [options]"
       end

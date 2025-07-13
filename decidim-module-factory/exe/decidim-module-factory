@@ -4,19 +4,20 @@
 # This is the executable for the decidim-module-factory gem.
 # It extends the original decidim generator with a new command.
 
-# Find original decidim executable from decidim-generators gem
-begin
-  gem "decidim-generators"
-rescue Gem::LoadError
-  puts "Could not load decidim-generators. Make sure it is installed."
-  exit 1
-end
+# We need to manually require the dev environment to load all of Decidim
+# and its dependencies correctly.
+require "decidim/dev"
+require "decidim/module_factory/generator"
 
 if ARGV[0] == "--module-factory"
+  # Remove the --module-factory flag
   ARGV.shift
+  # Prepend the command that the generator expects
   ARGV.unshift("component")
-end
 
-# Fallback to original decidim command
-decidim_executable = Gem.bin_path("decidim-generators", "decidim")
-load decidim_executable
+  # Start our generator
+  Decidim::ModuleFactory::Generator.start
+else
+  puts "Invalid command. Usage: decidim-module-factory --module-factory NAME [options]"
+  exit 1
+end
