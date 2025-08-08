@@ -13,7 +13,6 @@ bg:
         document: Документ
         domain: Домейн
         end_date: Крайна дата
-        hashtag: Хаштаг
         hero_image: Изображение за начална страница
         import_attachments: Импортиране на прикачени файлове
         import_categories: Импортиране на категории
@@ -39,7 +38,6 @@ bg:
         description: Описание
         developer_group: Група за популяризиране
         group_url: Уебсайт
-        hashtag: Хаштаг
         hero_image: Изображение
         local_area: Област на организацията
         meta_scope: Метаданни за обхвата
@@ -84,13 +82,11 @@ bg:
     admin:
       actions:
         activate: Активиране
-        configure: Конфигуриране
         confirm_destroy: Потвърждаване за изтриване
         destroy: Изтрий
         duplicate: Дубликирай
         edit: Редактирай
         import_process: Импортиране
-        moderate: Модериране
         new_process: Нов процес
         new_process_group: Нова група на процеса
         new_process_step: Нова фаза
@@ -107,7 +103,6 @@ bg:
         participatory_process_groups: Групи процеси
         participatory_process_groups_submenu:
           info: Информация
-          landing_page: Целева страница
         participatory_processes: Процеси
         participatory_processes_submenu:
           attachment_collections: Папки
@@ -115,7 +110,6 @@ bg:
           attachments: Прикачени файлове
           components: Компоненти
           info: Относно този процес
-          landing_page: Целева страница
           moderations: Модерации
           process_admins: Администратори на процеси
           steps: Фази

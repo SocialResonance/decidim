@@ -12,7 +12,6 @@ sk:
         developer_group: Skupina promotérov
         domain: Doména
         end_date: Dátum ukončenia
-        hashtag: hashtag
         hero_image: Domáce obrázok
         local_area: Oblasť organizácie
         meta_scope: Rozsah metadát
@@ -68,7 +67,6 @@ sk:
     admin:
       actions:
         activate: Aktivovať
-        configure: Konfigurovať
         confirm_destroy: Potvrďte zmazanie
         destroy: Odstrániť
         duplicate: Duplikát

@@ -12,7 +12,6 @@ id:
         developer_group: Grup promotor
         domain: Domain
         end_date: Tanggal akhir
-        hashtag: Tanda pagar
         hero_image: Gambar rumah
         local_area: Area organisasi
         meta_scope: Ruang lingkup metadata
@@ -59,7 +58,6 @@ id:
     admin:
       actions:
         activate: Mengaktifkan
-        configure: Konfigurasikan
         confirm_destroy: Konfirmasikan penghapusan
         destroy: Menghapus
         duplicate: Duplikat

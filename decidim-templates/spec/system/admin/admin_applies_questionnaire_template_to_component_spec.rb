@@ -22,14 +22,14 @@ describe "Admin applies questionnaire templates" do
   end
 
   it "installs a survey component" do
-    find("button[data-toggle=add-component-dropdown]").click
+    find("button[data-target=add-component-dropdown]").click
 
     within "#add-component-dropdown" do
-      find(".surveys").click
+      click_on "Surveys"
     end
 
     click_on "Add component"
-    within ".table-scroll" do
+    within ".table-stacked" do
       click_on "Surveys"
     end
     click_on "New survey"

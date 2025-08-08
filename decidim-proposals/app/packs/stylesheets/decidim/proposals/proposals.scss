@@ -1,4 +1,4 @@
-@import "tom-select/dist/scss/tom-select";
+@use "tom-select/dist/scss/tom-select";
 
 .proposal-list {
   &__aside {
@@ -83,6 +83,10 @@
 
     svg {
       @apply inline-block w-5 h-5;
+
+      &.view-icon {
+        @apply border border-black border-solid;
+      }
 
       &.view-icon--disabled {
         @apply fill-gray;

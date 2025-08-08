@@ -12,7 +12,10 @@ shared_examples "copy assemblies" do
 
   context "without any context" do
     it "copies the assembly with the basic fields" do
-      click_on "Duplicate", match: :first
+      within("tr", text: translated_attribute(assembly.title)) do
+        find("button[data-controller='dropdown']").click
+        click_on "Duplicate"
+      end
 
       within ".copy_assembly" do
         fill_in_i18n(
@@ -34,7 +37,10 @@ shared_examples "copy assemblies" do
 
   context "with context" do
     before do
-      click_on "Duplicate", match: :first
+      within("tr", text: translated_attribute(assembly.title)) do
+        find("button[data-controller='dropdown']").click
+        click_on "Duplicate"
+      end
 
       within ".copy_assembly" do
         fill_in_i18n(
@@ -55,7 +61,8 @@ shared_examples "copy assemblies" do
       expect(page).to have_content("successfully")
 
       within "tr", text: "Copy assembly" do
-        click_on "Configure"
+        find("button[data-controller='dropdown']").click
+        click_on "Edit"
       end
       within_admin_sidebar_menu do
         click_on "Components"
@@ -76,7 +83,10 @@ shared_examples "copy assemblies" do
     it "copies the child assembly with the basic fields" do
       click_on "Assemblies", match: :first
 
-      click_on "Duplicate", match: :first
+      within("tr", text: translated_attribute(assembly_parent.title)) do
+        find("button[data-controller='dropdown']").click
+        click_on "Duplicate"
+      end
 
       within ".copy_assembly" do
         fill_in_i18n(

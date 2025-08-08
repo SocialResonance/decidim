@@ -2,7 +2,7 @@
 
 shared_examples "export meetings" do
   let!(:meetings) { create_list(:meeting, 3, :published, component: current_component) }
-  let(:export_type) { "Export all" }
+  let(:export_type) { "Export" }
 
   it_behaves_like "export as CSV"
   it_behaves_like "export as JSON"
@@ -24,7 +24,7 @@ shared_examples "export as CSV" do
   it "exports a CSV" do
     expect(Decidim::PrivateExport.count).to eq(0)
 
-    find("span.exports", text: export_type).click
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Meetings as CSV"
       sleep 1
@@ -41,7 +41,7 @@ shared_examples "export as JSON" do
   it "exports a JSON" do
     expect(Decidim::PrivateExport.count).to eq(0)
 
-    find("span.exports", text: export_type).click
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Meetings as JSON"
       sleep 1

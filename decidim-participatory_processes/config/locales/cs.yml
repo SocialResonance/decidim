@@ -13,7 +13,6 @@ cs:
         document: Dokument
         domain: Doména
         end_date: Datum ukončení
-        hashtag: Hashtag
         hero_image: Domácí obrázek
         import_attachments: Importovat přílohy
         import_categories: Importovat kategorie
@@ -39,7 +38,6 @@ cs:
         description: Popis
         developer_group: Skupina propagátorů
         group_url: Webová stránka
-        hashtag: Hashtag
         hero_image: Obrázek
         local_area: Oblast působnosti organizace
         meta_scope: Metadata oblasti působnosti
@@ -90,15 +88,12 @@ cs:
     admin:
       actions:
         activate: Aktivovat
-        configure: Konfigurovat
         confirm_delete_process: Opravdu chcete odstranit tento proces? Pokud změníte názor, můžete jej obnovit později.
         confirm_destroy: Potvrďte smazání
         destroy: Odstranit
         duplicate: Duplikát
         edit: Upravit
         import_process: Importovat
-        menu_hidden: Skrýt
-        moderate: Moderovat
         new_process: Nový proces
         new_process_group: Nová skupina procesů
         new_process_step: Nový krok
@@ -116,7 +111,6 @@ cs:
         participatory_process_groups: Skupiny procesů
         participatory_process_groups_submenu:
           info: Info
-          landing_page: Úvodní stránka
         participatory_processes: Procesy
         participatory_processes_submenu:
           attachment_collections: Složky
@@ -124,7 +118,6 @@ cs:
           attachments: Přílohy
           components: Komponenty
           info: O tomto procesu
-          landing_page: Úvodní stránka
           moderations: Moderování
           private_users: Členové
           process_admins: Administrátoři procesu
@@ -359,7 +352,6 @@ cs:
           developer_group: Skupina tvůrců procesu. Jedná se o organizaci, která proces prosazuje.
           end_date: Datum ukončení procesu
           follows_count: Počet uživatelů sledujících tento prostor
-          hashtag: Hashtag Procesu, používaný pro Twitter/X
           id: Jedinečný identifikátor tohoto procesu
           local_area: Místní oblast procesu. Tohle je oblast organizace, kde probíhá proces.
           meta_scope: Rozsah metadat procesu
@@ -411,6 +403,8 @@ cs:
             few: "%{count} procesy"
             many: "%{count} procesů"
             other: "%{count} procesy"
+      related_processes:
+        help: Všechny vybrané procesy budou přiřazeny k této skupině, včetně těch, které jsou již přiřazeny do jiných skupin.
       show:
         title: Skupiny účastnických procesů
     participatory_process_steps:
@@ -419,6 +413,31 @@ cs:
     participatory_processes:
       admin:
         content_blocks:
+          democratic_quality_stats_settings_form:
+            inclusiveness:
+              cultural_origins_participation:
+                options:
+                  five: 80 - 100% = 5
+                  four: 60 - 80% = 4
+                  one: 0 - 20% = 1
+                  three: 40 - 60% = 3
+                  two: 20 - 40% = 2
+              functional_diversity_invited:
+                options:
+                  five: Ano = 5
+                  zero: Ne = 0
+              functional_diversity_participation:
+                options:
+                  five: 80 - 100% = 5
+                  four: 60 - 80% = 4
+                  one: 0 - 20% = 1
+            relevance:
+              relevance_percentage:
+                options:
+                  four: 60 - 80% = 4
+                  one: 0 - 20% = 1
+                  three: 40 - 60% = 3
+                  two: 20 - 40% = 2
           highlighted_processes:
             active: Aktivní
             all: Vše
@@ -459,6 +478,19 @@ cs:
             title: Obecná informace
             visibility: Viditelnost
       content_blocks:
+        democratic_quality_stats:
+          automatic_metrics:
+            indicators:
+              hybridization: Hybridizace
+              influence: Vliv občanů
+              traceability: Sledovatelnost
+              transparency: Odezva
+            name: Automatická měření
+          global_score:
+            name: Globální skóre
+          qualitative_metrics:
+            indicators:
+              relevance: Relevance
         extra_data:
           name: Fáze a doba trvání
         hero:
@@ -534,6 +566,7 @@ cs:
         related_processes: Související procesy
     statistics:
       processes_count: Procesy
+      processes_count_tooltip: Počet veřejně přístupných participačních procesů.
   layouts:
     decidim:
       participatory_process_groups:

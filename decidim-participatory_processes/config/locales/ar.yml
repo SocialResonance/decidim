@@ -12,7 +12,6 @@ ar:
         developer_group: مجموعة المروجين
         domain: نطاق
         end_date: تاريخ الانتهاء
-        hashtag: رابطة هاشتاق
         hero_image: الصورة الرئيسية
         local_area: منطقة التنظيم
         meta_scope: نطاق البيانات الوصفية
@@ -74,7 +73,6 @@ ar:
     admin:
       actions:
         activate: تفعيل
-        configure: تهيئة
         confirm_destroy: تأكيد الحذف
         destroy: حذف
         duplicate: مكرر

@@ -3,14 +3,15 @@
 shared_examples "export debates" do
   let!(:debates) { create_list(:debate, 3, component: current_component) }
 
-  let(:export_type) { "Export all" }
+  let(:export_type) { "Export" }
 
   it_behaves_like "export as CSV"
   it_behaves_like "export as JSON"
 
   it "exports a CSV" do
     expect(Decidim::PrivateExport.count).to eq(0)
-    find(".exports").click
+
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Comments as CSV"
       sleep 1
@@ -24,7 +25,8 @@ shared_examples "export debates" do
 
   it "exports a JSON" do
     expect(Decidim::PrivateExport.count).to eq(0)
-    find(".exports").click
+
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Comments as JSON"
       sleep 1
@@ -40,7 +42,8 @@ end
 shared_examples "export as CSV" do
   it "exports a CSV" do
     expect(Decidim::PrivateExport.count).to eq(0)
-    find("span.exports", text: export_type).click
+
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Debates as CSV"
       sleep 1
@@ -57,7 +60,7 @@ shared_examples "export as JSON" do
   it "exports a JSON" do
     expect(Decidim::PrivateExport.count).to eq(0)
 
-    find("span.exports", text: export_type).click
+    click_on export_type
     perform_enqueued_jobs do
       click_on "Debates as JSON"
       sleep 1
